@@ -18,7 +18,7 @@
 
 using namespace std;
 
-const int N = 100;//Количество фалов в каталоге
+const int N = 100; //Количество фалов в каталоге
 
 string listAllFiles(const string &dirName);
 string lastCon(string files);

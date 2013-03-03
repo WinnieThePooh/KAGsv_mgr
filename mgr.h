@@ -17,9 +17,9 @@ public:
     mgr();
     mgr(const mgr& orig);
     virtual ~mgr();
-    
-    string cut_lnick(string &str,int rpos);
-    string cut_rnick(string &str,int rpos);
+
+    string cut_lnick(string &str, int rpos);
+    string cut_rnick(string &str, int rpos);
     bool is_vip(string &player, string &VIP);
 
 private:

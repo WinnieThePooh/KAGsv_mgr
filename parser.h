@@ -27,15 +27,15 @@ public:
 private:
     mgr *m_kag;
     telnet *srv;
-    
-    string KAG_DIR,s_mgr, VIP, RCON;
+
+    string KAG_DIR, s_mgr, VIP, RCON;
     int con_pos, chat_pos, PORT;
     ifstream c_log, chat_log;
-    
+
     void parse_Logs(string console, string chat);
-    bool console_log_parse(const string fname);//Анализируем вывод из консоли
+    bool console_log_parse(const string fname); //Анализируем вывод из консоли
     bool chat_log_parse(const string fname);
-    
+
     bool parse_console_str(string &str);
     bool get_kills(string &str);
     bool get_chat_commands(string &str);

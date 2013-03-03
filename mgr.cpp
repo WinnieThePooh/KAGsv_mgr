@@ -16,7 +16,6 @@ mgr::mgr(const mgr& orig) {
 mgr::~mgr() {
 }
 
-
 string mgr::cut_lnick(string &str, int rpos) {
     int lpos;
     string player;

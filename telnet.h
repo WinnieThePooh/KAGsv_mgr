@@ -25,14 +25,14 @@ public:
     telnet();
     telnet(const telnet& orig);
     virtual ~telnet();
-    
+
     void s_connect(string ip, int port);
     void auth(string pass);
-    void close_conn();//закрытие соеденения
+    void close_conn(); //закрытие соеденения
     void cmd(string command);
-    
+
 private:
-     int sock;
+    int sock;
 
 };
 

@@ -9,23 +9,21 @@
 
 parser::parser(string dir) {
     KAG_DIR = dir;
-    RCON = "159357zxc";//Пароль на сервере, sv_tcpr = 1; - обязательно
+    RCON = "159357zxc"; //Пароль на сервере, sv_tcpr = 1; - обязательно
     PORT = 50301;
     VIP = "SnIcKeRs";
     s_mgr = "<<KAGsv_mgr>> ";
-    
+
     con_pos = 0;
     chat_pos = 0;
 
 
     string console, chat, DIRlogs;
 
-
     DIRlogs = listAllFiles(dir + "/Logs/");
-    cout << DIRlogs << endl;//выводим список всех файлов в папке Logs
+    cout << DIRlogs << endl; //выводим список всех файлов в папке Logs
 
-    if (!DIRlogs.empty()) 
-    {
+    if (!DIRlogs.empty()) {
         console = lastCon(DIRlogs);
         chat = lastChat(DIRlogs);
 
@@ -39,7 +37,7 @@ parser::parser(string dir) {
 
         //Соеденяемся с сервером
         srv = new telnet;
-        srv->s_connect("0", PORT);// 0- локальная петля
+        srv->s_connect("0", PORT); // 0- локальная петля
         sleep(1);
         srv->auth(RCON);
 
@@ -71,7 +69,7 @@ void parser::parse_Logs(string console, string chat) {
             break;
         }
         sleep(1);
-        
+
         if (!chat_log_parse(chat)) {
             printf("Ошибка получения вывода чата!");
             break;
@@ -163,10 +161,10 @@ bool parser::parse_console_str(string &str) {
      WARNING: API call failed: cURL Error in putStatus(): Timeout was reached
      WARNING: API call failed: cURL Error in putStatus(): Couldn't resolve host name
      */
-    
+
     string player;
     int n;
-    
+
     if (str.find("Closing console device: Signal 2 received") != -1) {
         cout << s_mgr << "!!!Сервер неактивен!!!" << endl;
         return true;
@@ -221,18 +219,19 @@ bool parser::get_chat_commands(string &str) {
     //Сделать команды только для VIP и выше
     int n;
     string player;
-    
+
     if ((n = str.find("> /help")) != -1) {
         player = m_kag->cut_lnick(str, n);
 
         cout << s_mgr << player << " использовал команду /help" << endl;
 
-        if (m_kag->is_vip(player,VIP) == true) {
-            cout <<s_mgr << player << " может использовать команды." << endl;
+        if (m_kag->is_vip(player, VIP) == true) {
+            cout << s_mgr << player << " может использовать команды." << endl;
             srv->cmd("/msg -------Commands list:-------");
             srv->cmd("/msg help - show all commands");
-            srv->cmd("/msg rank [player] - show plyer's kill/death ratio");
-            srv->cmd("/msg top - show top 10 players");
+            srv->cmd("/msg kick [player] - kick player from server");
+            srv->cmd("/msg rank [player] - show player's kill/death ratio(don't work)");
+            srv->cmd("/msg top - show top 10 players(don't work)");
             srv->cmd("/msg ----------------------------");
         }
         return true;
@@ -241,7 +240,7 @@ bool parser::get_chat_commands(string &str) {
     if ((n = str.find("> /top")) != -1) {
         player = m_kag->cut_lnick(str, n);
 
-        if (m_kag->is_vip(player,VIP) == true) {
+        if (m_kag->is_vip(player, VIP) == true) {
             srv->cmd("/msg -------Top 10 players:-------");
             srv->cmd("/msg 1. Player");
             srv->cmd("/msg 2. Player");
@@ -255,6 +254,16 @@ bool parser::get_chat_commands(string &str) {
             srv->cmd("/msg 10. Player");
             srv->cmd("/msg -----------------------------");
         }
+
+    }
+
+    if ((n = str.find("> /kick")) != -1) {
+        //Трололо команда, кикает того кто ее ввел
+        player = m_kag->cut_lnick(str, n);
+
+        srv->cmd("/msg " + player + " was kicked.");
+        srv->cmd("/msg Reason: Lo-lo-lo Tro-lo-lo :)");
+        srv->cmd("/kick " + player);
 
     }
     return false;
