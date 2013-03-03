@@ -4,23 +4,28 @@
  * 
  * Created on 4 Февраль 2013 г., 14:27
  */
-//Блабла изменения
+
 #include "parser.h"
 
 parser::parser(string dir) {
     KAG_DIR = dir;
-    pos = 0;
-    chat_pos = 0;
-    mgr = "<<KAGsv_mgr>> ";
+    RCON = "159357zxc";//Пароль на сервере, sv_tcpr = 1; - обязательно
+    PORT = 50301;
     VIP = "SnIcKeRs";
+    s_mgr = "<<KAGsv_mgr>> ";
+    
+    con_pos = 0;
+    chat_pos = 0;
+
 
     string console, chat, DIRlogs;
 
 
     DIRlogs = listAllFiles(dir + "/Logs/");
-    cout << DIRlogs << endl;
+    cout << DIRlogs << endl;//выводим список всех файлов в папке Logs
 
-    if (!DIRlogs.empty()) {
+    if (!DIRlogs.empty()) 
+    {
         console = lastCon(DIRlogs);
         chat = lastChat(DIRlogs);
 
@@ -28,21 +33,23 @@ parser::parser(string dir) {
         cout << "last console: " << console << endl;
         // cout<<"last chat: "<< chat<< endl;
 
-        //Парсим с конца файла
-        pos = get_fsize(dir + "/Logs/" + console);
+        //Парсим с конца файла, получаем размер фалов
+        con_pos = get_fsize(dir + "/Logs/" + console);
         chat_pos = get_fsize(dir + "/Logs/" + chat);
 
         //Соеденяемся с сервером
         srv = new telnet;
-        srv->s_connect("0", 50301);
+        srv->s_connect("0", PORT);// 0- локальная петля
         sleep(1);
-        srv->auth("159357zxc");
+        srv->auth(RCON);
 
         //парсим вывод
+        m_kag = new mgr;
         parse_Logs(dir + "/Logs/" + console,
                 dir + "/Logs/" + chat);
     } else {
         cout << "Каталог пустой или не существует!!!" << endl;
+        exit(1);
     }
 
 
@@ -63,15 +70,16 @@ void parser::parse_Logs(string console, string chat) {
             printf("Ошибка получения вывода консоли!");
             break;
         }
-
+        sleep(1);
+        
         if (!chat_log_parse(chat)) {
             printf("Ошибка получения вывода чата!");
             break;
         }
-        //usleep(1000000);//пауза
         sleep(1);
     }
     delete(srv);
+    delete(m_kag);
 }
 
 //Чтение и анализ логов консоли
@@ -84,7 +92,7 @@ bool parser::console_log_parse(const string fname) {
 
     if (!c_log.is_open()) return false;
 
-    c_log.seekg(pos); //Ставим курсор на новую позицию в файле
+    c_log.seekg(con_pos); //Ставим курсор на новую позицию в файле
 
     if (c_log.tellg() == -1) return false;
 
@@ -103,7 +111,7 @@ bool parser::console_log_parse(const string fname) {
                 break; //В любом случае завершаем цикл
             }
         }
-        if (l_pos != -1) pos = l_pos; //Записываем положения курсора
+        if (l_pos != -1) con_pos = l_pos; //Записываем положения курсора
         l_pos = c_log.tellg();
 
     }
@@ -155,9 +163,12 @@ bool parser::parse_console_str(string &str) {
      WARNING: API call failed: cURL Error in putStatus(): Timeout was reached
      WARNING: API call failed: cURL Error in putStatus(): Couldn't resolve host name
      */
+    
+    string player;
     int n;
+    
     if (str.find("Closing console device: Signal 2 received") != -1) {
-        cout << mgr << "!!!Сервер неактивен!!!" << endl;
+        cout << s_mgr << "!!!Сервер неактивен!!!" << endl;
         return true;
     }
 
@@ -170,9 +181,8 @@ bool parser::parse_console_str(string &str) {
         }
      */
     if ((n = str.find(" connected (admin:")) != -1) {
-        string player;
-        player = cut_lnick(str, n);
-        cout << mgr << "Игрок " << player << " зашел на сервер" << endl;
+        player = m_kag->cut_lnick(str, n);
+        cout << s_mgr << "Игрок " << player << " зашел на сервер" << endl;
         return true;
     }
 }
@@ -189,19 +199,18 @@ bool parser::get_kills(string &str) {
 
      */
 
+    string player1, player2, player;
     int n, i;
 
     if ((n = str.find(" slew ")) != -1 && (i = str.find(" with his sword")) != -1) {
-        string player1, player2;
-        player1 = cut_lnick(str, n);
-        player2 = cut_lnick(str, i);
+        player1 = m_kag->cut_lnick(str, n);
+        player2 = m_kag->cut_lnick(str, i);
         cout << "Игрок " << player1 << " зарубил мечом " << player2 << endl;
 
     }
 
     if ((n = str.find(" fell on a spike")) != -1) {
-        string player;
-        player = cut_lnick(str, n);
+        player = m_kag->cut_lnick(str, n);
         cout << "Игрок " << player << " упал на шипы" << endl;
         return true;
     }
@@ -211,15 +220,15 @@ bool parser::get_kills(string &str) {
 bool parser::get_chat_commands(string &str) {
     //Сделать команды только для VIP и выше
     int n;
-
+    string player;
+    
     if ((n = str.find("> /help")) != -1) {
-        string player;
-        player = cut_lnick(str, n);
+        player = m_kag->cut_lnick(str, n);
 
-        cout << mgr << player << " использовал команду /help" << endl;
+        cout << s_mgr << player << " использовал команду /help" << endl;
 
-        if (is_vip(player) == true) {
-            cout << mgr << player << " может использовать команды." << endl;
+        if (m_kag->is_vip(player,VIP) == true) {
+            cout <<s_mgr << player << " может использовать команды." << endl;
             srv->cmd("/msg -------Commands list:-------");
             srv->cmd("/msg help - show all commands");
             srv->cmd("/msg rank [player] - show plyer's kill/death ratio");
@@ -230,10 +239,9 @@ bool parser::get_chat_commands(string &str) {
     }
 
     if ((n = str.find("> /top")) != -1) {
-        string player;
-        player = cut_lnick(str, n);
+        player = m_kag->cut_lnick(str, n);
 
-        if (is_vip(player) == true) {
+        if (m_kag->is_vip(player,VIP) == true) {
             srv->cmd("/msg -------Top 10 players:-------");
             srv->cmd("/msg 1. Player");
             srv->cmd("/msg 2. Player");
@@ -260,30 +268,4 @@ bool parser::get_chat_commands(string &str) {
     }
  */
 
-string parser::cut_lnick(string &str, int rpos) {
-    int lpos;
-    string player;
-    lpos = str.rfind(" ", rpos - 1);
-    player = str.substr(lpos + 1, rpos - lpos - 1); //*lpos-1 cut space
-    return player;
-}
 
-string parser::cut_rnick(string &str, int lpos) {
-    int rpos;
-    string player;
-    rpos = str.find(" ", lpos);
-    player = str.substr(lpos, rpos - lpos); //*lpos-1 cut space
-    return player;
-}
-
-int parser::get_fsize(string fileName) {
-    ifstream file(fileName.c_str(), ios::binary | ios::ate);
-    int size = file.tellg();
-    return size;
-}
-
-bool parser::is_vip(string player) {
-    //может сработать, если явл частью ника!!!! нужно исправить
-    if (VIP.find(player) == -1) return false;
-    return true;
-}

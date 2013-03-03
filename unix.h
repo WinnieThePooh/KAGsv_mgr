@@ -13,6 +13,7 @@
 #include<iostream>
 #include<stdlib.h>
 #include<string>
+#include<fstream>
 
 
 using namespace std;
@@ -23,6 +24,7 @@ string listAllFiles(const string &dirName);
 string lastCon(string files);
 string lastChat(string files);
 long long int cutNumb(string line);
+int get_fsize(string fileName);
 
 #endif	/* UNIX_H */
 

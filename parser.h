@@ -11,6 +11,7 @@
 
 #include "unix.h"
 #include "telnet.h"
+#include "mgr.h"
 
 
 using namespace std;
@@ -24,9 +25,11 @@ public:
     parser(const parser& orig);
     virtual ~parser();
 private:
+    mgr *m_kag;
     telnet *srv;
-    string KAG_DIR,mgr, VIP;
-    int pos, chat_pos;
+    
+    string KAG_DIR,s_mgr, VIP, RCON;
+    int con_pos, chat_pos, PORT;
     ifstream c_log, chat_log;
     
     void parse_Logs(string console, string chat);
@@ -36,13 +39,6 @@ private:
     bool parse_console_str(string &str);
     bool get_kills(string &str);
     bool get_chat_commands(string &str);
-    
-    string cut_lnick(string &str,int rpos);
-    string cut_rnick(string &str,int rpos);
-
-    int get_fsize(string fileName);
-    
-    bool is_vip(string player);
 };
 
 #endif	/* PARSER_H */

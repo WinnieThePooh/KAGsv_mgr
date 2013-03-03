@@ -37,6 +37,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 OBJECTFILES= \
 	${OBJECTDIR}/unix.o \
 	${OBJECTDIR}/main.o \
+	${OBJECTDIR}/mgr.o \
 	${OBJECTDIR}/telnet.o \
 	${OBJECTDIR}/parser.o
 
@@ -74,6 +75,11 @@ ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/main.o main.cpp
+
+${OBJECTDIR}/mgr.o: mgr.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -g -MMD -MP -MF $@.d -o ${OBJECTDIR}/mgr.o mgr.cpp
 
 ${OBJECTDIR}/telnet.o: telnet.cpp 
 	${MKDIR} -p ${OBJECTDIR}

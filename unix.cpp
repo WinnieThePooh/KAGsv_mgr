@@ -154,3 +154,9 @@ long long int cutNumb(string line)
     }
     return 0;
 }
+
+int get_fsize(string fileName) {
+    ifstream file(fileName.c_str(), ios::binary | ios::ate);
+    int size = file.tellg();
+    return size;
+}
