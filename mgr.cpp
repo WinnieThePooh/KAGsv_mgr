@@ -16,7 +16,7 @@ mgr::mgr(const mgr& orig) {
 mgr::~mgr() {
 }
 
-string mgr::cut_lnick(string &str, int rpos) {
+string mgr::cut_lnick(string str, int rpos) {
     int lpos;
     string player;
     lpos = str.rfind(" ", rpos - 1);
@@ -24,7 +24,7 @@ string mgr::cut_lnick(string &str, int rpos) {
     return player;
 }
 
-string mgr::cut_rnick(string &str, int lpos) {
+string mgr::cut_rnick(string str, int lpos) {
     int rpos;
     string player;
     rpos = str.find(" ", lpos);
@@ -32,7 +32,7 @@ string mgr::cut_rnick(string &str, int lpos) {
     return player;
 }
 
-bool mgr::is_vip(string &player, string &VIP) {
+bool mgr::is_vip(string player, string VIP) {
     //может сработать, если явл частью ника!!!! нужно исправить
     if (VIP.find(player) == -1) return false;
     return true;

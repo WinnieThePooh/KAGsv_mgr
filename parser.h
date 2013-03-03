@@ -28,7 +28,7 @@ private:
     mgr *m_kag;
     telnet *srv;
 
-    string KAG_DIR, s_mgr, VIP, RCON;
+    string KAG_DIR, s_mgr, VIP, RCON, MOTD;
     int con_pos, chat_pos, PORT;
     ifstream c_log, chat_log;
 
@@ -39,6 +39,8 @@ private:
     bool parse_console_str(string &str);
     bool get_kills(string &str);
     bool get_chat_commands(string &str);
+    
+    void motd(int n);
 };
 
 #endif	/* PARSER_H */
