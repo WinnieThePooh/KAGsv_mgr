@@ -8,7 +8,9 @@
 #ifndef MGR_H
 #define	MGR_H
 
-#include<string>
+#include <string>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -20,9 +22,13 @@ public:
 
     string cut_lnick(string str, int rpos);
     string cut_rnick(string str, int rpos);
-    bool is_vip(string player, string VIP);
+    string to_msg(string str);
+    
+    
 
 private:
+    int kills,deaths,collapses;
+    
 
 };
 

@@ -24,6 +24,7 @@ string listAllFiles(const string &dirName);
 string lastCon(string files);
 string lastChat(string files);
 long long int cutNumb(string line);
+string f_read(string fname);
 int get_fsize(string fileName);
 
 #endif	/* UNIX_H */

@@ -130,6 +130,24 @@ long long int cutNumb(string line) {//from 13-02-20-16-29-23 to 130220162923
     return 0;
 }
 
+
+string f_read(string fname){
+  string line,str;
+  ifstream file (fname.c_str());
+  if (file.is_open())
+  {
+    while ( file.good() )
+    {
+      getline (file,line);
+      str+= line + "\n";
+    }
+    file.close();
+    return str;
+  }
+  cout<< "err: unix::f_read"<<endl;
+  return " ";
+}
+
 int get_fsize(string fileName) {
     ifstream file(fileName.c_str(), ios::binary | ios::ate);
     int size = file.tellg();

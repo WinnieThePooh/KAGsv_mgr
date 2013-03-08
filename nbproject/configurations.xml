@@ -29,6 +29,8 @@
     </logicalFolder>
     <itemPath>mgr.cpp</itemPath>
     <itemPath>mgr.h</itemPath>
+    <itemPath>player.cpp</itemPath>
+    <itemPath>player.h</itemPath>
     <itemPath>telnet.cpp</itemPath>
     <itemPath>telnet.h</itemPath>
     <itemPath>unix.cpp</itemPath>
@@ -56,6 +58,10 @@
       </item>
       <item path="parser.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="player.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="player.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="telnet.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="telnet.h" ex="false" tool="3" flavor2="0">
@@ -72,10 +78,12 @@
       </toolsSet>
       <compileType>
         <cTool>
-          <developmentMode>5</developmentMode>
+          <developmentMode>6</developmentMode>
+          <stripSymbols>true</stripSymbols>
+          <architecture>1</architecture>
         </cTool>
         <ccTool>
-          <developmentMode>5</developmentMode>
+          <developmentMode>6</developmentMode>
           <stripSymbols>true</stripSymbols>
           <architecture>1</architecture>
         </ccTool>
@@ -83,7 +91,7 @@
           <developmentMode>5</developmentMode>
         </fortranCompilerTool>
         <asmTool>
-          <developmentMode>5</developmentMode>
+          <developmentMode>6</developmentMode>
           <architecture>1</architecture>
         </asmTool>
         <linkerTool>
@@ -100,6 +108,10 @@
       <item path="parser.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="parser.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="player.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="player.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="telnet.cpp" ex="false" tool="1" flavor2="0">
       </item>

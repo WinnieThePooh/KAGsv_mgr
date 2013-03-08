@@ -32,9 +32,23 @@ string mgr::cut_rnick(string str, int lpos) {
     return player;
 }
 
-bool mgr::is_vip(string player, string VIP) {
-    //может сработать, если явл частью ника!!!! нужно исправить
-    if (VIP.find(player) == -1) return false;
-    return true;
+string mgr::to_msg(string str) {
+    int n,i;
+    
+    i = str.size();
+    
+   if((n=str.find("\n\n"))!=-1){
+        str.erase(n,i-n);
+}
+  
+    n=1;
+    
+    while (n > 0) {
+        n = str.find("\n",n);
+        str.insert(n + 1, "/msg ");
+        n++;
+        //i--;        
+    }
+    return str;
 }
 

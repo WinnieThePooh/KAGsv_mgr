@@ -12,6 +12,7 @@
 #include "unix.h"
 #include "telnet.h"
 #include "mgr.h"
+#include "player.h"
 
 
 using namespace std;
@@ -27,6 +28,7 @@ public:
 private:
     mgr *m_kag;
     telnet *srv;
+    player *pl;
 
     string KAG_DIR, s_mgr, VIP, RCON, MOTD;
     int con_pos, chat_pos, PORT;

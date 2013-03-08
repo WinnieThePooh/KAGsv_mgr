@@ -12,11 +12,16 @@ parser::parser(string dir) {
     KAG_DIR = dir;
     RCON = "159357zxc"; //Пароль на сервере, sv_tcpr = 1; - обязательно
     PORT = 50103;
+    //список тех кто может использовать команды
     VIP = "SnIcKeRs; XpeH; SalvaTioN; MrDeath; Toks4700; House_M_D; 16th; Cpa3y; heket123; fantamas2d; Screeam;";
     s_mgr = "<<KAGsv_mgr>> ";
 
-    MOTD = "vk.com/kingarthursgold";
-
+    //MOTD = "vk.com/kingarthursgold";
+    m_kag = new mgr;
+    MOTD = m_kag->to_msg(f_read("motd.txt"));
+    
+    cout<< MOTD;
+            
     con_pos = 0;
     chat_pos = 0;
 
@@ -38,6 +43,8 @@ parser::parser(string dir) {
         con_pos = get_fsize(dir + "/Logs/" + console);
         chat_pos = get_fsize(dir + "/Logs/" + chat);
 
+        pl = new player(dir+"Stats/");
+        
         //Соеденяемся с сервером
         srv = new telnet;
         srv->s_connect("0", PORT); // 0- локальная петля
@@ -45,11 +52,12 @@ parser::parser(string dir) {
         srv->auth(RCON);
 
         //парсим вывод
-        m_kag = new mgr;
+        
         parse_Logs(dir + "/Logs/" + console,
                 dir + "/Logs/" + chat);
     } else {
         cout << "Каталог пустой или не существует!!!" << endl;
+        delete(m_kag);
         exit(1);
     }
 
@@ -61,12 +69,16 @@ parser::parser(const parser& orig) {
 }
 
 parser::~parser() {
+    delete(pl);
+    delete(srv);
+    delete(m_kag);
 }
 
 void parser::parse_Logs(string console, string chat) {
 
     long int time1 = time(NULL);
     int n = 0;
+    
     while (true) {
 
         /*  if (!console_log_parse(console)) {
@@ -76,12 +88,13 @@ void parser::parse_Logs(string console, string chat) {
           sleep(1);*/
 
         if (!chat_log_parse(chat)) {
-            printf("Ошибка получения вывода чата!");
-            break;
+            //printf("Ошибка получения вывода чата!");
+            //break;
         }
-        sleep(1);
+        sleep(2);
 
         long int time2 = time(NULL);
+        
         if (difftime(time2, time1) > 10 * 60) {
             // motd(MOTD);//раз в 10 минут выводить MOTD сообщение
             sleep(1);
@@ -94,8 +107,7 @@ void parser::parse_Logs(string console, string chat) {
             time1 = time2;
         }
     }
-    delete(srv);
-    delete(m_kag);
+
 }
 
 //Чтение и анализ логов консоли
@@ -120,7 +132,7 @@ bool parser::console_log_parse(const string fname) {
 
         /////////////////////////////////////////////////////////////
         if (new_line != old_line && new_line != "") {
-            cout << new_line << endl; //Выводим строку, если она не пустая
+            //cout << new_line << endl; //Выводим строку, если она не пустая
 
             //Если находим совпадение, то останавливаем проверку
             while (true) {
@@ -162,7 +174,7 @@ bool parser::chat_log_parse(const string fname) {
             /////////////////////////////////////////////////////////////
             //Если находим совпадение, то останавливаем проверку
             while (true) {
-                //if (get_kills(new_line)) break;
+                if (get_kills(new_line)) break;
                 if (get_chat_commands(new_line)) break;
 
                 break; //В любом случае завершаем цикл
@@ -215,23 +227,66 @@ bool parser::get_kills(string &str) {
      * [16:15:22] [ArSq SnIcKeRs fell on a spike trap
      * [17:05:43] [ArSq SnIcKeRs is now spectating
      * [12:54:00] SnIcKeRs shot Henry with his arrow
-     *  Jarl andrija525 gibbed [ArSq SnIcKeRs into pieces
-
+     * Jarl andrija525 gibbed [ArSq SnIcKeRs into pieces
+     * [ArSq SnIcKeRs fell to his death
+     * [ArSq Chromabird pushed Jarko95 to his death
      */
 
     string player1, player2, player;
     int n, i;
-
-    if ((n = str.find(" slew ")) != -1 && (i = str.find(" with his sword")) != -1) {
+    
+    if((n = str.find(" gibbed ")) != -1 && (i = str.find(" into pieces")) != -1) {
         player1 = m_kag->cut_lnick(str, n);
         player2 = m_kag->cut_lnick(str, i);
-        cout << "Игрок " << player1 << " зарубил мечом " << player2 << endl;
+        
+        pl->kill(player1);
+        pl->die(player2);
         return true;
     }
 
+    if ((n = str.find(" slew ")) != -1 && (i = str.find(" with ")) != -1) {
+        player1 = m_kag->cut_lnick(str, n);
+        player2 = m_kag->cut_lnick(str, i);
+        
+        pl->kill(player1);
+        pl->die(player2);
+        //cout << "Игрок " << player1 << " зарубил мечом " << player2 << endl;
+        return true;
+    }
+    
+    if((n = str.find(" shot ")) != -1 && (i = str.find(" with ")) != -1) {
+        player1 = m_kag->cut_lnick(str, n);
+        player2 = m_kag->cut_lnick(str, i);
+        
+        pl->kill(player1);
+        pl->die(player2);
+        return true;
+    }
+    
+    if ((n = str.find(" fell to ")) != -1) {
+        player = m_kag->cut_lnick(str, n);
+        //cout << "Игрок " << player << " разбился" << endl;
+        
+        pl->die(player);
+        return true;
+    }
+
+
     if ((n = str.find(" fell on a spike")) != -1) {
         player = m_kag->cut_lnick(str, n);
-        cout << "Игрок " << player << " упал на шипы" << endl;
+        //cout << "Игрок " << player << " упал на шипы" << endl;
+        pl->die(player);
+       
+
+        return true;
+    }
+    
+        if((n = str.find(" pushed ")) != -1 && (i = str.find(" to ")) != -1) {
+        player1 = m_kag->cut_lnick(str, n);
+        player2 = m_kag->cut_lnick(str, i);
+        
+        pl->kill(player1);
+        pl->die(player2);
         return true;
     }
 
@@ -248,7 +303,7 @@ bool parser::get_chat_commands(string &str) {
 
         cout << s_mgr << player << " использовал команду /help" << endl;
 
-        if (m_kag->is_vip(player, VIP) == true) {
+        if (pl->is_vip(player, VIP) == true) {
             cout << s_mgr << player << " может использовать команды." << endl;
             srv->cmd("/msg -------Commands list:-------");
             srv->cmd("/msg help - show all commands");
@@ -256,7 +311,7 @@ bool parser::get_chat_commands(string &str) {
             srv->cmd("/msg motd - show MOTD message");
             srv->cmd("/msg motd set [message] - set new MOTD message");
             srv->cmd("/msg mpGen - generate new maps");
-            srv->cmd("/msg rank [player] - show player's kill/death ratio(don't work)");
+            srv->cmd("/msg rank [player] - show player's kill/death ratio");
             srv->cmd("/msg top - show top 10 players(don't work)");
             srv->cmd("/msg ----------------------------");
         }
@@ -266,7 +321,7 @@ bool parser::get_chat_commands(string &str) {
     if ((n = str.find("> /top")) != -1) {
         player = m_kag->cut_lnick(str, n);
 
-        if (m_kag->is_vip(player, VIP) == true) {
+        if (pl->is_vip(player, VIP) == true) {
             srv->cmd("/msg -------Top 10 players:-------");
             srv->cmd("/msg 1. Player");
             srv->cmd("/msg 2. Player");
@@ -292,14 +347,25 @@ bool parser::get_chat_commands(string &str) {
         srv->cmd("/kick " + player);
         return true;
     }
+    
+        if ((n = str.find("> /noob")) != -1) {
+        //Трололо команда, кикает того кто ее ввел
+        player = m_kag->cut_lnick(str, n);
+
+        srv->cmd("/msg " + player + " says that SalvaTioN is noob.");
+
+        return true;
+    }
 
     if ((n = str.find("> /motd set")) != -1) {
         //Установка нового сообщения
 
         player = m_kag->cut_lnick(str, n);
 
-        if (m_kag->is_vip(player, VIP) == true) {
+        if (pl->is_vip(player, VIP) == true) {
             MOTD = str.substr(n + 12, str.length() - n); // > /motd set -12 chars
+            MOTD.insert(0,"/msg ");
+            
             cout << s_mgr << player << " установил новое сообщение MOTD:" << MOTD << endl;
             srv->cmd("/msg " + player + " set new MOTD.");
         }
@@ -307,8 +373,9 @@ bool parser::get_chat_commands(string &str) {
     }
     
      if ((n = str.find("> /motd")) != -1) {
+        player = m_kag->cut_lnick(str, n);
        
-        if (m_kag->is_vip(player, VIP) == true) {
+        if (pl->is_vip(player, VIP) == true) {
             motd(0);
         }
         return true;
@@ -319,9 +386,27 @@ bool parser::get_chat_commands(string &str) {
 
         player = m_kag->cut_lnick(str, n);
 
-        if (m_kag->is_vip(player, VIP) == true) {
+        if (pl->is_vip(player, VIP) == true) {
             srv->cmd("/msg Generating new maps.");
             system("./mcgen 200 ./Base/Maps/ ./Base/Scripts/"); //200 карт
+        }
+        return true;
+    }
+    
+
+    if ((n = str.find("> /rank")) != -1) {
+        string stats;
+        player = m_kag->cut_lnick(str, n);
+        
+        if (pl->is_vip(player, VIP) == true) {
+
+            player = str.substr(n + 8, str.length() - n); //"> /rank" -7 chars
+           
+            stats = pl->get_stats(player);
+            cout<<stats<<endl;
+            
+            srv->cmd("/msg "+player+" stats:");
+            srv->cmd("/msg "+stats);
         }
         return true;
     }
@@ -333,12 +418,12 @@ void parser::motd(int n) {
                 //КОСТЫЛЬ! Если две одинаковые команды, сообщение не выводится :'(
             if (n == 0) {
                 n = 1;
-                srv->cmd("/msg " + MOTD);
-                srv->cmd("/msg Admins: " + VIP);
+                srv->cmd(MOTD);
+               // srv->cmd("/msg Admins: " + VIP);
             } else {
                 n = 0;
-                srv->cmd("/msg " + MOTD + ".");
-                srv->cmd("/msg Admins: " + VIP);
+                srv->cmd(MOTD + ".");
+                //srv->cmd("/msg Admins: " + VIP);
             }
 }
 
