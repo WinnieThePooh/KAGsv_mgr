@@ -20,13 +20,13 @@ public:
     player(const player& orig);
     virtual ~player();
     
-    string get_stats(string player);
+    string get_stats(const string &player);
     
-    void kill(string player);
-    void die(string player);
-    void collapse(string player);
+    void kill(const string &player);
+    void die(const string &player);
+    void collapse(const string &player);
     
-    bool is_vip(string player, string VIP);
+    bool is_vip(const string &player, const string &VIP);
     
 private:
     double kills, deaths, collapses; 
@@ -34,10 +34,12 @@ private:
     ofstream f_w;
     ifstream f_r;
     
-    void write_stats(string &player, bool kill, bool death);
+    void write_stats(const string &player, bool kill, bool death);
     
-    bool f_read();
-    bool f_write();
+    bool f_read(const string &player);
+    bool f_write(const string &player);
+    
+   const char* fullname(const string &player);
 };
 
 #endif	/* PLAYER_H */
