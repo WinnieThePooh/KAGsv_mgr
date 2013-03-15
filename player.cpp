@@ -35,7 +35,11 @@ void player::collapse(const string &player) {
 }
 
 bool player::f_read(const string &player) {
+    /*
     f_r.open(fullname(player));
+    if (!f_r)
+    {
+    }else{
     if (f_r.is_open()) {
         f_r >> kills;
         f_r >> deaths;
@@ -44,20 +48,57 @@ bool player::f_read(const string &player) {
         f_r.clear();
         return true;
     }
-    return false;
+    }
+    return false;*/
+    
+    try
+    {
+    f_r.open(fullname(player));
+    f_r >> kills;
+    f_r >> deaths;
+    f_r.close();
+    f_r.clear();
+    }
+    catch (...){
+        cout<<"Error! Can't read file"<<endl;
+        return false;
+    }
+    
+    return true;
 }
 
+
 bool player::f_write(const string &player) {
-    f_w.open(fullname(player));
+    /*f_w.open(fullname(player));
+    if (!f_w)
+    {
+    }else{
     if (f_w.is_open()) {
         f_w.seekp(0);
         f_w << kills << " " << deaths;
 
         f_w.close();
         f_w.clear();
+        
+        kills = deaths = 0;//обнуляем переменные
         return true;
     }
-    return false;
+    }
+    return false;*/
+    
+    try
+    {
+      f_w.open(fullname(player));
+      f_w.seekp(0);
+      f_w << kills << " " << deaths;
+      f_w.close();
+      f_w.clear();
+    }
+    catch(...){
+      cout<<"Error! Can't write to file"<<endl;
+      return false;  
+    }
+    return true;
 }
 
 void player::write_stats(const string &player, bool kill, bool death) {

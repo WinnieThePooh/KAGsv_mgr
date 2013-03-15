@@ -241,6 +241,7 @@ bool parser::get_kills(string &str) {
         
         if (player2!=" "){
         pl->kill(player1);
+        sleep(1);
         pl->die(player2);
         }
         else pl->die(player1);
@@ -253,6 +254,7 @@ bool parser::get_kills(string &str) {
         player2 = m_kag->cut_lnick(str, i);
 
         pl->kill(player1);
+        sleep(1);
         pl->die(player2);
         //cout << "Игрок " << player1 << " зарубил мечом " << player2 << endl;
         return true;
@@ -263,6 +265,7 @@ bool parser::get_kills(string &str) {
         player2 = m_kag->cut_lnick(str, i);
 
         pl->kill(player1);
+        sleep(1);
         pl->die(player2);
         return true;
     }
@@ -290,6 +293,7 @@ bool parser::get_kills(string &str) {
         player2 = m_kag->cut_lnick(str, i);
 
         pl->kill(player1);
+        sleep(1);
         pl->die(player2);
         return true;
     }
