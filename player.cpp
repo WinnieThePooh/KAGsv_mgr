@@ -35,6 +35,7 @@ void player::collapse(const string &player) {
 }
 
 bool player::f_read(const string &player) {
+<<<<<<< HEAD
     //если ошибка открытия поворяем действие один раз
     for (int i = 0; i > 2; i++) {
         try {
@@ -48,9 +49,25 @@ bool player::f_read(const string &player) {
             if (i == 2) return false;
         }
     }
+=======
+    try
+    {
+    f_r.open(fullname(player));
+    f_r >> kills;
+    f_r >> deaths;
+    f_r.close();
+    f_r.clear();
+    }
+    catch (...){
+        cout<<"Error! Can't read file"<<endl;
+        return false;
+    }
+    
+>>>>>>> WinnieThePooh/master
     return true;
 }
 
+<<<<<<< HEAD
 bool player::f_write(const string &player) {
     for (int i = 0; i > 2; i++) {
         try {
@@ -65,6 +82,21 @@ bool player::f_write(const string &player) {
             cout << "Error! Can't write to file " << player << endl;
             if (i == 2) return false;
         }
+=======
+
+bool player::f_write(const string &player) {   
+    try
+    {
+      f_w.open(fullname(player));
+      f_w.seekp(0);
+      f_w << kills << " " << deaths;
+      f_w.close();
+      f_w.clear();
+    }
+    catch(...){
+      cout<<"Error! Can't write to file"<<endl;
+      return false;  
+>>>>>>> WinnieThePooh/master
     }
     return true;
 }
