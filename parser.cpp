@@ -16,11 +16,10 @@ parser::parser(string dir) {
     VIP = "SnIcKeRs; XpeH; SalvaTioN; MrDeath; Toks4700; House_M_D; 16th; Cpa3y; heket123; fantamas2d; Screeam;";
     s_mgr = "<<KAGsv_mgr>> ";
 
-    //MOTD = "vk.com/kingarthursgold";
     m_kag = new mgr;
-    MOTD = m_kag->to_msg(f_read("motd.txt"));
+    MOTD = m_kag->to_msg(motd_load("motd.txt"));
 
-    cout << MOTD;
+    cout << MOTD <<endl;
 
     con_pos = 0;
     chat_pos = 0;
@@ -32,8 +31,10 @@ parser::parser(string dir) {
     //cout << DIRlogs << endl; //выводим список всех файлов в папке Logs
 
     if (!DIRlogs.empty()) {
-        console = lastCon(DIRlogs);
-        chat = lastChat(DIRlogs);
+        //console = lastCon(DIRlogs);
+        //chat = lastChat(DIRlogs);
+        console = lastLog(DIRlogs,"console-");
+        chat = lastLog(DIRlogs,"chat-");
 
         // cout<< DIRlogs;
         cout << "last console: " << console << endl;
@@ -57,7 +58,11 @@ parser::parser(string dir) {
                 dir + "/Logs/" + chat);
     } else {
         cout << "Каталог пустой или не существует!!!" << endl;
+        
+        delete(pl);
+        delete(srv);
         delete(m_kag);
+        
         exit(1);
     }
 

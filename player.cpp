@@ -35,73 +35,42 @@ void player::collapse(const string &player) {
 }
 
 bool player::f_read(const string &player) {
-    /*
-    f_r.open(fullname(player));
-    if (!f_r)
-    {
-    }else{
-    if (f_r.is_open()) {
-        f_r >> kills;
-        f_r >> deaths;
-        
-        f_r.close();
-        f_r.clear();
-        return true;
+    //если ошибка открытия поворяем действие один раз
+    for (int i = 0; i > 2; i++) {
+        try {
+            f_r.open(fullname(player));
+            f_r >> kills;
+            f_r >> deaths;
+            f_r.close();
+            f_r.clear();
+        } catch (...) {
+            cout << "Error! Can't read file" << endl;
+            if (i == 2) return false;
+        }
     }
-    }
-    return false;*/
-    
-    try
-    {
-    f_r.open(fullname(player));
-    f_r >> kills;
-    f_r >> deaths;
-    f_r.close();
-    f_r.clear();
-    }
-    catch (...){
-        cout<<"Error! Can't read file"<<endl;
-        return false;
-    }
-    
     return true;
 }
 
-
 bool player::f_write(const string &player) {
-    /*f_w.open(fullname(player));
-    if (!f_w)
-    {
-    }else{
-    if (f_w.is_open()) {
-        f_w.seekp(0);
-        f_w << kills << " " << deaths;
+    for (int i = 0; i > 2; i++) {
+        try {
+            kills = deaths = 0;//обнуляем чтобы при ошибке не выводилась чужая стата
 
-        f_w.close();
-        f_w.clear();
-        
-        kills = deaths = 0;//обнуляем переменные
-        return true;
-    }
-    }
-    return false;*/
-    
-    try
-    {
-      f_w.open(fullname(player));
-      f_w.seekp(0);
-      f_w << kills << " " << deaths;
-      f_w.close();
-      f_w.clear();
-    }
-    catch(...){
-      cout<<"Error! Can't write to file"<<endl;
-      return false;  
+            f_w.open(fullname(player));
+            f_w.seekp(0);
+            f_w << kills << " " << deaths;
+            f_w.close();
+            f_w.clear();
+        } catch (...) {
+            cout << "Error! Can't write to file " << player << endl;
+            if (i == 2) return false;
+        }
     }
     return true;
 }
 
 void player::write_stats(const string &player, bool kill, bool death) {
+
     if (f_read(player)) {
 
         if (kill) {
@@ -111,11 +80,11 @@ void player::write_stats(const string &player, bool kill, bool death) {
         if (death) {
             deaths++;
         }
-       f_write(player);
+        f_write(player);
     } else {
         //При первом выполнении ф-ции, файла может не быть
         //Создаем его
-        
+
         //Если файл удается создать
         if (f_write(player)) {
             write_stats(player, kill, death);
@@ -141,7 +110,6 @@ string player::get_stats(const string &player) {
     return "";
 }
 
-const char* player::fullname(const string &player)
-{
+const char* player::fullname(const string &player) {
     return string(DIR + player).c_str();
 }

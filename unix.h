@@ -21,10 +21,9 @@ using namespace std;
 const int N = 100; //Количество фалов в каталоге
 
 string listAllFiles(const string &dirName);
-string lastCon(string files);
-string lastChat(string files);
+string lastLog(string files, string prefix);
 long long int cutNumb(string line);
-string f_read(string fname);
+string motd_load(string fname);
 int get_fsize(string fileName);
 
 #endif	/* UNIX_H */

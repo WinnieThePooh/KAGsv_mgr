@@ -32,7 +32,7 @@ string listAllFiles(const string &dirName) {
     return files;
 }
 
-string lastCon(string files) {
+string lastLog(string files, string prefix) {
     string arr[100];
     string last;
 
@@ -42,7 +42,7 @@ string lastCon(string files) {
     l = 0;
 
     while (true) {
-        if ((n = files.find("console-", n)) != -1) {
+        if ((n = files.find(prefix, n)) != -1) {
             i = files.find(".txt", n) + 4;
             arr[l] = files.substr(n, i - n);
 
@@ -57,41 +57,6 @@ string lastCon(string files) {
     last = arr[l];
     while (l > 0) {
 
-        if (cutNumb(last) < cutNumb(arr[l])) {
-            last = arr[l];
-        }
-
-        l--;
-    }
-
-    return last;
-}
-
-string lastChat(string files) {
-    string arr[100];
-    string last;
-
-    int n, i, l;
-    n = 0;
-    i = 0;
-    l = 0;
-
-    while (true) {
-        if ((n = files.find("chat-", n)) != -1) {
-            i = files.find(".txt", n) + 4;
-            arr[l] = files.substr(n, i - n);
-
-            n = i;
-            l++;
-        } else {
-            l--;
-            break;
-        }
-    }
-
-    last = arr[l];
-    while (l > 0) {
-        //Находим самое большое число в имени файла
         if (cutNumb(last) < cutNumb(arr[l])) {
             last = arr[l];
         }
@@ -131,7 +96,7 @@ long long int cutNumb(string line) {//from 13-02-20-16-29-23 to 130220162923
 }
 
 
-string f_read(string fname){
+string motd_load(string fname){
   string line,str;
   ifstream file (fname.c_str());
   if (file.is_open())
@@ -144,7 +109,7 @@ string f_read(string fname){
     file.close();
     return str;
   }
-  cout<< "err: unix::f_read"<<endl;
+  cout<< "err: motd_load()"<<endl;
   return " ";
 }
 
