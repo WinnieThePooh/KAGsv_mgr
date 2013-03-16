@@ -5,4 +5,12 @@
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="1"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
+        <file>file:/home/snickers/NetBeansProjects/KAGsv_mgr/main.cpp</file>
+        <file>file:/home/snickers/NetBeansProjects/KAGsv_mgr/parser.cpp</file>
+        <file>file:/home/snickers/NetBeansProjects/KAGsv_mgr/unix.cpp</file>
+        <file>file:/home/snickers/NetBeansProjects/KAGsv_mgr/unix.h</file>
+        <file>file:/home/snickers/NetBeansProjects/KAGsv_mgr/telnet.cpp</file>
+        <file>file:/home/snickers/NetBeansProjects/KAGsv_mgr/player.cpp</file>
+    </open-files>
 </project-private>
