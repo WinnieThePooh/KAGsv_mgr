@@ -33,7 +33,6 @@ public:
 
 private:
     int sock;
-    //blalbal
 
 };
 
