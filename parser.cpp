@@ -11,7 +11,7 @@
 parser::parser(string dir) {
     KAG_DIR = dir;
     RCON = "159357zxc"; //Пароль на сервере, sv_tcpr = 1; - обязательно
-    PORT = 50103;
+    PORT = 50301;
     //список тех кто может использовать команды
     VIP = "SnIcKeRs; XpeH; SalvaTioN; MrDeath; Toks4700; House_M_D; 16th; Cpa3y; heket123; fantamas2d; Screeam;";
     s_mgr = "<<KAGsv_mgr>> ";
@@ -19,7 +19,7 @@ parser::parser(string dir) {
     m_kag = new mgr;
     MOTD = m_kag->to_msg(motd_load("motd.txt"));
 
-    cout << MOTD <<endl;
+    //cout << MOTD <<endl;
 
     con_pos = 0;
     chat_pos = 0;
@@ -40,7 +40,7 @@ parser::parser(string dir) {
         cout << "last console: " << console << endl;
         cout << "last chat: " << chat << endl;
 
-        //Парсим с конца файла, получаем размер фалов
+        //Парсим с конца файла, получаем размер файлов
         con_pos = get_fsize(dir + "/Logs/" + console);
         chat_pos = get_fsize(dir + "/Logs/" + chat);
 
@@ -58,12 +58,14 @@ parser::parser(string dir) {
                 dir + "/Logs/" + chat);
     } else {
         cout << "Каталог пустой или не существует!!!" << endl;
-        
-        delete(pl);
+       
+        //this->~parser();
+              
+        /*delete(pl);
         delete(srv);
         delete(m_kag);
-        
-        exit(1);
+        */
+        exit(0);
     }
 
 
@@ -86,17 +88,17 @@ void parser::parse_Logs(string console, string chat) {
 
     while (true) {
 
-        /*  if (!console_log_parse(console)) {
-              printf("Ошибка получения вывода консоли!");
-              break;
+          if (!console_log_parse(console)) {
+             // printf("Ошибка получения вывода консоли!");
+             // break;
           }
-          sleep(1);*/
+        sleep(1);
 
         if (!chat_log_parse(chat)) {
             //printf("Ошибка получения вывода чата!");
             //break;
         }
-        sleep(2);
+        sleep(1);
 
         long int time2 = time(NULL);
 
@@ -110,6 +112,13 @@ void parser::parse_Logs(string console, string chat) {
             else n = 1;
 
             time1 = time2;
+        }
+        
+        //проверка соеденения
+        if(!srv->is_alive()){
+            srv->close_conn();
+            cout<<"Connection closed!"<<endl<<"Quitting."<<endl;
+            exit(0);
         }
     }
 
@@ -205,6 +214,15 @@ bool parser::parse_console_str(string &str) {
 
     if (str.find("Closing console device: Signal 2 received") != -1) {
         cout << s_mgr << "!!!Сервер неактивен!!!" << endl;
+        exit(0);
+        return true;
+    }
+    
+    if (str.find("] /nextmap") != -1) {
+        cout << s_mgr << "/next map" << endl;
+        srv->cmd("/msg *****");
+        srv->cmd("/msg Admin: \'/nextmap\'");
+        srv->cmd("/msg *****");
         return true;
     }
 

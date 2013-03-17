@@ -30,6 +30,7 @@ public:
     void auth(string pass);
     void close_conn(); //закрытие соеденения
     void cmd(string command);
+    bool is_alive();
 
 private:
     int sock;

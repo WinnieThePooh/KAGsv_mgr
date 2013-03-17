@@ -1,7 +1,7 @@
-/* 
- * File:   player.cpp
+/*
+ * File: player.cpp
  * Author: snickers
- * 
+ *
  * Created on 7 Март 2013 г., 15:19
  */
 
@@ -35,70 +35,51 @@ void player::collapse(const string &player) {
 }
 
 bool player::f_read(const string &player) {
-<<<<<<< HEAD
     //если ошибка открытия поворяем действие один раз
-    for (int i = 0; i > 2; i++) {
+    kills = deaths = 0; //обнуляем чтобы при ошибке не выводилась чужая стата
+
+    bool err = false;
+    for (int i = 0; i < 1; i++) {
+
         try {
+
             f_r.open(fullname(player));
+            if (!f_r.is_open()) return false;
             f_r >> kills;
             f_r >> deaths;
             f_r.close();
             f_r.clear();
+
         } catch (...) {
             cout << "Error! Can't read file" << endl;
-            if (i == 2) return false;
+            err = true;
         }
+        if (err == false) return true;
     }
-=======
-    try
-    {
-    f_r.open(fullname(player));
-    f_r >> kills;
-    f_r >> deaths;
-    f_r.close();
-    f_r.clear();
-    }
-    catch (...){
-        cout<<"Error! Can't read file"<<endl;
-        return false;
-    }
-    
->>>>>>> WinnieThePooh/master
-    return true;
+    return false;
+
 }
 
-<<<<<<< HEAD
 bool player::f_write(const string &player) {
-    for (int i = 0; i > 2; i++) {
-        try {
-            kills = deaths = 0;//обнуляем чтобы при ошибке не выводилась чужая стата
+    bool err = false;
+    //если ошибка, то повторяем 1 раз
+    for (int i = 0; i < 1; i++) {
 
+        try {
             f_w.open(fullname(player));
+            if (!f_w.is_open()) return false;
             f_w.seekp(0);
             f_w << kills << " " << deaths;
             f_w.close();
             f_w.clear();
+
         } catch (...) {
             cout << "Error! Can't write to file " << player << endl;
-            if (i == 2) return false;
+            err = true;
         }
-=======
-
-bool player::f_write(const string &player) {   
-    try
-    {
-      f_w.open(fullname(player));
-      f_w.seekp(0);
-      f_w << kills << " " << deaths;
-      f_w.close();
-      f_w.clear();
+        if (err == false) return true;
     }
-    catch(...){
-      cout<<"Error! Can't write to file"<<endl;
-      return false;  
->>>>>>> WinnieThePooh/master
-    }
-    return true;
+    return false;
 }
 
 void player::write_stats(const string &player, bool kill, bool death) {
@@ -135,7 +116,7 @@ bool player::is_vip(const string &player, const string &VIP) {
 string player::get_stats(const string &player) {
     if (f_read(player)) {
         stringstream out; //Преобразование в string
-        out << "Kills: " << kills << " Deaths: " << deaths << " k/d: " << double(kills / deaths);
+        out << "Kills: " << kills << " Deaths: " << deaths << " k/d: " << float(kills / deaths);
         return out.str();
     } else printf("Can't open file");
 

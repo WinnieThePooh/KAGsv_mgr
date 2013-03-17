@@ -7,6 +7,8 @@
 
 #include "telnet.h"
 
+char buf[2];
+
 telnet::telnet() {
 
 }
@@ -52,4 +54,10 @@ void telnet::close_conn() {
 void telnet::cmd(string command) {
     command.append("\n");
     send(sock, command.c_str(), command.length(), 0);
+}
+
+bool telnet::is_alive() {
+    if (recv(sock, buf, 2, 0) == 0) return false;
+
+    return true;
 }
