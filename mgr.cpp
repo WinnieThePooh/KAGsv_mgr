@@ -22,10 +22,10 @@ string mgr::cut_lnick(string str, int rpos) {
 
     //Отрезаем ник корректно
     while (true) {
-        if ((lpos = str.rfind(")", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos!=-1) break;
-        if ((lpos = str.rfind("{", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos!=-1) break;
-        if ((lpos = str.rfind("(", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos!=-1) break;
-        if ((lpos = str.rfind("}", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos!=-1) break;
+        if ((lpos = str.rfind(")", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos != -1) break;
+        if ((lpos = str.rfind("{", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos != -1) break;
+        if ((lpos = str.rfind("(", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos != -1) break;
+        if ((lpos = str.rfind("}", rpos - 1)) > str.rfind(" ", rpos - 1) && lpos != -1) break;
 
         lpos = str.rfind(" ", rpos - 1);
         break;

@@ -7,7 +7,7 @@
 
 #include "telnet.h"
 
-char buf[2];
+char buf[10];
 
 telnet::telnet() {
 
@@ -57,7 +57,7 @@ void telnet::cmd(string command) {
 }
 
 bool telnet::is_alive() {
-    if (recv(sock, buf, 2, 0) == 0) return false;
+    if (recv(sock, buf, 10, 0) == 0) return false;
 
     return true;
 }

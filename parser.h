@@ -41,7 +41,7 @@ private:
     bool parse_console_str(string &str);
     bool get_kills(string &str);
     bool get_chat_commands(string &str);
-    
+
     void motd(int n);
 };
 

@@ -95,22 +95,19 @@ long long int cutNumb(string line) {//from 13-02-20-16-29-23 to 130220162923
     return 0;
 }
 
-
-string motd_load(string fname){
-  string line,str;
-  ifstream file (fname.c_str());
-  if (file.is_open())
-  {
-    while ( file.good() )
-    {
-      getline (file,line);
-      str+= line + "\n";
+string motd_load(string fname) {
+    string line, str;
+    ifstream file(fname.c_str());
+    if (file.is_open()) {
+        while (file.good()) {
+            getline(file, line);
+            str += line + "\n";
+        }
+        file.close();
+        return str;
     }
-    file.close();
-    return str;
-  }
-  cout<< "err: motd_load()"<<endl;
-  return " ";
+    cout << "err: motd_load()" << endl;
+    return " ";
 }
 
 int get_fsize(string fileName) {

@@ -11,7 +11,7 @@
 parser::parser(string dir) {
     KAG_DIR = dir;
     RCON = "159357zxc"; //Пароль на сервере, sv_tcpr = 1; - обязательно
-    PORT = 50301;
+    PORT = 50103;
     //список тех кто может использовать команды
     VIP = "SnIcKeRs; XpeH; SalvaTioN; MrDeath; Toks4700; House_M_D; 16th; Cpa3y; heket123; fantamas2d; Screeam;";
     s_mgr = "<<KAGsv_mgr>> ";
@@ -33,8 +33,8 @@ parser::parser(string dir) {
     if (!DIRlogs.empty()) {
         //console = lastCon(DIRlogs);
         //chat = lastChat(DIRlogs);
-        console = lastLog(DIRlogs,"console-");
-        chat = lastLog(DIRlogs,"chat-");
+        console = lastLog(DIRlogs, "console-");
+        chat = lastLog(DIRlogs, "chat-");
 
         // cout<< DIRlogs;
         cout << "last console: " << console << endl;
@@ -43,6 +43,8 @@ parser::parser(string dir) {
         //Парсим с конца файла, получаем размер файлов
         con_pos = get_fsize(dir + "/Logs/" + console);
         chat_pos = get_fsize(dir + "/Logs/" + chat);
+
+        cout << chat_pos << endl;
 
         pl = new player(dir + "Stats/");
 
@@ -58,13 +60,14 @@ parser::parser(string dir) {
                 dir + "/Logs/" + chat);
     } else {
         cout << "Каталог пустой или не существует!!!" << endl;
-       
+        cout << "Quitting." << endl;
+
         //this->~parser();
-              
+
         /*delete(pl);
         delete(srv);
         delete(m_kag);
-        */
+         */
         exit(0);
     }
 
@@ -81,21 +84,24 @@ parser::~parser() {
     delete(m_kag);
 }
 
+////////////////
+
 void parser::parse_Logs(string console, string chat) {
 
+    //инициализация таймера
     long int time1 = time(NULL);
     int n = 0;
 
     while (true) {
 
-          if (!console_log_parse(console)) {
-             // printf("Ошибка получения вывода консоли!");
-             // break;
-          }
+        if (!console_log_parse(console)) {
+            printf("Ошибка получения вывода консоли!");
+            // break;
+        }
         sleep(1);
 
         if (!chat_log_parse(chat)) {
-            //printf("Ошибка получения вывода чата!");
+            printf("Ошибка получения вывода чата!");
             //break;
         }
         sleep(1);
@@ -104,21 +110,18 @@ void parser::parse_Logs(string console, string chat) {
 
         if (difftime(time2, time1) > 10 * 60) {
             // motd(MOTD);//раз в 10 минут выводить MOTD сообщение
-            sleep(1);
-
             motd(n);
 
-            if (n != 0) n = 0;
-            else n = 1;
+            if (n != 0) n = 0; else n = 1;
 
             time1 = time2;
         }
-        
+
         //проверка соеденения
-        if(!srv->is_alive()){
+        if (!srv->is_alive()) {
             srv->close_conn();
-            cout<<"Connection closed!"<<endl<<"Quitting."<<endl;
-            exit(0);
+            cout << "Connection closed!" << endl << "Quitting." << endl;
+            exit(1);
         }
     }
 
@@ -130,9 +133,15 @@ bool parser::console_log_parse(const string fname) {
     string old_line, new_line;
     int l_pos;
 
+    if (con_pos <= 0) {
+        con_pos = get_fsize(fname);
+        return true;
+    }
+
     c_log.open(fname.c_str());
 
     if (!c_log.is_open()) return false;
+
 
     c_log.seekg(con_pos - 1); //Ставим курсор на новую позицию в файле, -1 чтобы файл заного не грузился
 
@@ -162,12 +171,16 @@ bool parser::console_log_parse(const string fname) {
     c_log.close(); //закрываем файл
     return true;
 }
-
 //Чтение и анализ логов чата
 
 bool parser::chat_log_parse(const string fname) {
     string old_line, new_line;
     int l_pos;
+
+    if (chat_pos <= 0) {
+        chat_pos = get_fsize(fname);
+        return true;
+    }
 
     chat_log.open(fname.c_str());
 
@@ -202,7 +215,7 @@ bool parser::chat_log_parse(const string fname) {
     chat_log.close(); //закрываем файл
     return true;
 }
-
+/////////////////////PARSING/////////////////////////
 bool parser::parse_console_str(string &str) {
     /*
      WARNING: API call failed: cURL Error in putStatus(): Timeout was reached
@@ -214,10 +227,10 @@ bool parser::parse_console_str(string &str) {
 
     if (str.find("Closing console device: Signal 2 received") != -1) {
         cout << s_mgr << "!!!Сервер неактивен!!!" << endl;
-        exit(0);
+        exit(1);
         return true;
     }
-    
+
     if (str.find("] /nextmap") != -1) {
         cout << s_mgr << "/next map" << endl;
         srv->cmd("/msg *****");
@@ -239,6 +252,14 @@ bool parser::parse_console_str(string &str) {
         cout << s_mgr << "Игрок " << player << " зашел на сервер" << endl;
         return true;
     }
+    
+    //[20:07:24] <RCON> Player kubae123 left the game (players left 10)
+    if ((n = str.find(" left the game ")) != -1) {
+        player = m_kag->cut_lnick(str, n);
+        cout << s_mgr << "Игрок " << player << " покинул сервер" << endl;
+        return true;
+    }
+
     return false;
 }
 
@@ -253,25 +274,34 @@ bool parser::get_kills(string &str) {
      * Jarl andrija525 gibbed [ArSq SnIcKeRs into pieces
      * [ArSq SnIcKeRs fell to his death
      * [ArSq Chromabird pushed Jarko95 to his death
+     * [22:40:55] Raspatas pushed battlegoat on a spike trap
+     * [23:00:16] <RCON> battlegoat pushed Wilhelmatt to his death
+     * [23:01:56] <RCON> Bartezi took some cyanide
+     * [ArSq SnIcKeRs was squashed under a collapse
+     * [ArSq SalvaTioN assisted in Bartezi dying under falling rocks
+     * MASTE temz hammered [ArSq SnIcKeRs to death
+     * 
+     * [22:59:07] <RCON> battlegoat hammered alex1995alex to death
      */
 
     string player1, player2, player;
     int n, i;
 
+    //bomb
     if ((n = str.find(" gibbed ")) != -1 && (i = str.find(" into pieces")) != -1) {
         player1 = m_kag->cut_lnick(str, n);
         player2 = m_kag->cut_lnick(str, i);
-        
-        if (player2!=" "){
-        pl->kill(player1);
-        sleep(1);
-        pl->die(player2);
-        }
-        else pl->die(player1);
-        
+
+        if (player2 != " ") {
+            pl->kill(player1);
+            sleep(1);
+            pl->die(player2);
+        } else pl->die(player1);
+
         return true;
     }
 
+    //sword
     if ((n = str.find(" slew ")) != -1 && (i = str.find(" with ")) != -1) {
         player1 = m_kag->cut_lnick(str, n);
         player2 = m_kag->cut_lnick(str, i);
@@ -283,6 +313,7 @@ bool parser::get_kills(string &str) {
         return true;
     }
 
+    //arrow
     if ((n = str.find(" shot ")) != -1 && (i = str.find(" with ")) != -1) {
         player1 = m_kag->cut_lnick(str, n);
         player2 = m_kag->cut_lnick(str, i);
@@ -293,6 +324,21 @@ bool parser::get_kills(string &str) {
         return true;
     }
 
+    //catapult
+    if ((n = str.find(" assisted ")) != -1 && (i = str.find(" dying under falling rocks ")) != -1) {
+        player1 = m_kag->cut_lnick(str, n);
+        player2 = m_kag->cut_lnick(str, i);
+
+        if (player2 != " ") {
+            pl->kill(player1);
+            sleep(1);
+            pl->die(player2);
+        } else pl->die(player1);
+
+        return true;
+    }
+
+    //fail
     if ((n = str.find(" fell to ")) != -1) {
         player = m_kag->cut_lnick(str, n);
         //cout << "Игрок " << player << " разбился" << endl;
@@ -301,7 +347,7 @@ bool parser::get_kills(string &str) {
         return true;
     }
 
-
+    //spikes
     if ((n = str.find(" fell on a spike")) != -1) {
         player = m_kag->cut_lnick(str, n);
         //cout << "Игрок " << player << " упал на шипы" << endl;
@@ -311,6 +357,7 @@ bool parser::get_kills(string &str) {
         return true;
     }
 
+    //pushing
     if ((n = str.find(" pushed ")) != -1 && (i = str.find(" to ")) != -1) {
         player1 = m_kag->cut_lnick(str, n);
         player2 = m_kag->cut_lnick(str, i);
@@ -332,7 +379,7 @@ bool parser::get_chat_commands(string &str) {
     if ((n = str.find("> /help")) != -1) {
         player = m_kag->cut_lnick(str, n);
 
-        cout << s_mgr << player << " использовал команду /help" << endl;
+        //cout << s_mgr << player << " использовал команду /help" << endl;
 
         if (pl->is_vip(player, VIP) == true) {
             //cout << s_mgr << player << " может использовать команды." << endl;
@@ -424,13 +471,15 @@ bool parser::get_chat_commands(string &str) {
 
             if (str.size() > n + 8) {
                 player = str.substr(n + 8, str.length() - n); //"> /rank" -7 chars
-                
+
                 if (player == "me") player = m_kag->cut_lnick(str, n);
-                
+
                 stats = pl->get_stats(player);
 
-                srv->cmd("/msg " + player + "'s statistics");
-                srv->cmd("/msg " + stats);
+                if (stats != "") {
+                    srv->cmd("/msg " + player + "'s statistics");
+                    srv->cmd("/msg " + stats);
+                }
             }
         }
         return true;
@@ -438,6 +487,7 @@ bool parser::get_chat_commands(string &str) {
 
     return false;
 }
+/////////////////////////////////////////////////////
 
 void parser::motd(int n) {
     //КОСТЫЛЬ! Если две одинаковые команды, сообщение не выводится :'(
@@ -451,13 +501,3 @@ void parser::motd(int n) {
         //srv->cmd("/msg Admins: " + VIP);
     }
 }
-
-/*
-     if (str.find("Closing console device: Signal 2 received")!=-1)
-    {
-        cout<<mgr<< "!!!Сервер неактивен!!!"<< endl;
-        return true;
-    }
- */
-
-

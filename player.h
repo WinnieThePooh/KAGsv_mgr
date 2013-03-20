@@ -19,27 +19,27 @@ public:
     player(string dir);
     player(const player& orig);
     virtual ~player();
-    
+
     string get_stats(const string &player);
-    
+
     void kill(const string &player);
     void die(const string &player);
     void collapse(const string &player);
-    
+
     bool is_vip(const string &player, const string &VIP);
-    
+
 private:
-    double kills, deaths, collapses; 
+    double kills, deaths, collapses;
     string DIR;
-    ofstream f_w;
-    ifstream f_r;
-    
+    ofstream f_w;//write
+    ifstream f_r;//read
+
     void write_stats(const string &player, bool kill, bool death);
-    
+
     bool f_read(const string &player);
     bool f_write(const string &player);
-    
-   const char* fullname(const string &player);
+
+    const char* fullname(const string &player);
 };
 
 #endif	/* PLAYER_H */

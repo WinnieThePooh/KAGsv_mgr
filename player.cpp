@@ -51,7 +51,7 @@ bool player::f_read(const string &player) {
             f_r.clear();
 
         } catch (...) {
-            cout << "Error! Can't read file" << endl;
+            cout << "Error! Can't read file" << player << endl;
             err = true;
         }
         if (err == false) return true;
@@ -89,11 +89,11 @@ void player::write_stats(const string &player, bool kill, bool death) {
         if (kill) {
             kills++;
         }
-
         if (death) {
             deaths++;
         }
         f_write(player);
+        
     } else {
         //При первом выполнении ф-ции, файла может не быть
         //Создаем его

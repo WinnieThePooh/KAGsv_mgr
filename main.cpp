@@ -16,6 +16,7 @@ using namespace std;
 int main(int argc, char** argv) {
 
     parser log("./");
+    //parser log("/home/snickers/Games/KAG_SERVER");
 
     return 0;
 }

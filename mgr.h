@@ -23,12 +23,12 @@ public:
     string cut_lnick(string str, int rpos);
     string cut_rnick(string str, int rpos);
     string to_msg(string str);
-    
-    
+
+
 
 private:
-    int kills,deaths,collapses;
-    
+    int kills, deaths, collapses;
+
 
 };
 
